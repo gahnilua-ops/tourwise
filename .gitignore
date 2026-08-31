@@ -1,0 +1,32 @@
+node_modules/
+.expo/
+dist/
+web-build/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+.env
+.env.local
+
+# macOS
+.DS_Store
+
+# Xcode
+ios/build/
+*.pbxuser
+*.xcworkspace
+!default.xcworkspace
+
+# Android
+android/app/build/
+android/.gradle/
+*.iml
+
+# Testing
+coverage/
+
+# EAS
+.eas/
