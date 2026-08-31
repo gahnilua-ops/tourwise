@@ -8,13 +8,14 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Dimensions,
+  Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
 import { PLACES, type Place } from '@/data/places';
-import { MapPin, Compass, MyLocation } from 'lucide-react-native';
+import { MapPin, Compass, LocateIcon } from 'lucide-react-native';
 import { colors, radius, spacing, fontSize, fontWeight } from '@/app/theme';
 
 const { width, height } = Dimensions.get('window');
@@ -136,7 +137,7 @@ export function MapScreen() {
         onPress={handleMyLocation}
         activeOpacity={0.8}
       >
-        <MyLocation size={24} color={colors.text} />
+        <LocateIcon size={24} color={colors.text} />
       </TouchableOpacity>
 
       {/* Legend */}
@@ -146,9 +147,6 @@ export function MapScreen() {
     </View>
   );
 }
-
-// Image component for bottom sheet (avoid require cycle)
-const { Image } = require('react-native');
 
 const styles = StyleSheet.create({
   container: {

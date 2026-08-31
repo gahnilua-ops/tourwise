@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
-import { ImagePicker } from 'expo-image-picker';
+import * as ImagePicker from 'expo-image-picker';
 import { Car, Camera, FileText, CheckCircle, Loader2, ShieldCheck, ArrowLeft } from 'lucide-react-native';
 import { supabase } from '@/core/services/supabaseClient';
 import { Button } from '@/shared/components/Button';
@@ -21,14 +21,21 @@ import { colors, radius, spacing, fontSize, fontWeight } from '@/app/theme';
 
 type RouteParams = { token?: string; field?: string };
 
-const FIELDS = [
+interface UploadFieldDef {
+  key: string;
+  label: string;
+  icon: any;
+  accept: string;
+}
+
+const FIELDS: UploadFieldDef[] = [
   { key: 'vehicle_photo', label: 'Vehicle Photo', icon: Car, accept: 'image/*' },
   { key: 'driver_selfie', label: "Driver's Selfie", icon: Camera, accept: 'image/*' },
   { key: 'license', label: "Driver's License", icon: FileText, accept: 'image/*' },
   { key: 'permit', label: 'Operator Permit', icon: ShieldCheck, accept: 'image/*' },
-] as const;
+];
 
-type FieldKey = (typeof FIELDS)[number]['key'];
+type FieldKey = UploadFieldDef['key'];
 
 export function DriverUploadScreen() {
   const route = useRoute<RouteProp<Record<string, RouteParams>, string>>();
@@ -217,7 +224,7 @@ function UploadField({
   onUpload,
   onRemove,
 }: {
-  field: typeof FIELDS[0];
+  field: UploadFieldDef;
   file: string | null;
   uploading: boolean;
   done: boolean;

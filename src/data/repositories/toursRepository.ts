@@ -3,6 +3,7 @@
 // (fetchTours / fetchTourById) can replace these when the tours table is seeded.
 import { supabase } from '@/core/services/supabaseClient';
 import { TOURS, type Tour } from '@/data/tours';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Static catalog (default — swap for live Supabase query when ready)
 export async function fetchTours(): Promise<Tour[]> {
@@ -19,8 +20,7 @@ const WISHLIST_KEY = 'tourwise_wishlist';
 
 export async function getWishlist(): Promise<string[]> {
   try {
-    const { getItem } = await import('@react-native-async-storage/async-storage');
-    const raw = await getItem(WISHLIST_KEY);
+    const raw = await AsyncStorage.getItem(WISHLIST_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -31,15 +31,13 @@ export async function addToWishlist(tourId: string): Promise<string[]> {
   const list = await getWishlist();
   if (!list.includes(tourId)) {
     list.push(tourId);
-    const { setItem } = await import('@react-native-async-storage/async-storage');
-    await setItem(WISHLIST_KEY, JSON.stringify(list));
+    await AsyncStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
   }
   return list;
 }
 
 export async function removeFromWishlist(tourId: string): Promise<string[]> {
-  const list = await getWishlist().then((l) => l.filter((id) => id !== tourId));
-  const { setItem } = await import('@react-native-async-storage/async-storage');
-  await setItem(WISHLIST_KEY, JSON.stringify(list));
+  const list = (await getWishlist()).filter((id) => id !== tourId);
+  await AsyncStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
   return list;
 }

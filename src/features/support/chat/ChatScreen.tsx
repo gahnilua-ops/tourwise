@@ -79,12 +79,13 @@ export function ChatScreen() {
   };
 
   const handleSend = async () => {
-    if (!input.trim() || !session) return;
+    const email = session?.user?.email;
+    if (!input.trim() || !email) return;
     setSending(true);
     const body = input.trim();
     setInput('');
     await supabase.from('messages').insert({
-      sender_email: session.user.email,
+      sender_email: email,
       sender_role: 'guest',
       body,
     });
@@ -136,7 +137,7 @@ export function ChatScreen() {
           </View>
         ) : (
           messages.map((msg) => (
-            <MessageBubble key={msg.id} message={msg} currentEmail={session?.user.email} />
+            <MessageBubble key={msg.id} message={msg} currentEmail={session?.user?.email} />
           ))
         )}
       </ScrollView>

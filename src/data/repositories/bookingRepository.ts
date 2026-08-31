@@ -74,6 +74,7 @@ export async function createBooking(
     .single();
 
   if (error) throw new Error(error.message);
+  if (!data) throw new Error('Booking created but no ID returned');
   return { bookingId: data.id };
 }
 
@@ -123,5 +124,6 @@ export async function createPaymentIntent(
     { body: { amountCents, bookingId } },
   );
   if (error) throw new Error(error.message);
+  if (!data?.clientSecret) throw new Error('No client secret returned');
   return data.clientSecret;
 }

@@ -22,6 +22,7 @@ export interface Tour {
   description: string;
   featured?: boolean;
   bestseller?: boolean;
+  rating?: number | null;
   hotel_name?: string;
   room_type?: string;
   accommodation_notes?: string;
@@ -47,6 +48,7 @@ export const TOURS: Tour[] = [
     description: 'Explore the iconic geological wonders and lush inland heritage of Bohol with our private air-conditioned transport and local guide.',
     featured: true,
     bestseller: true,
+    rating: 4.9,
     itinerary_stops: [
       { time: '7:00 AM', title: 'Hotel pickup', description: 'Pickup from your Panglao hotel or resort in an air-conditioned vehicle.' },
       { time: '8:00 AM', title: 'Baclayon Church', description: 'Quick photo stop at one of the oldest stone churches in the Philippines.' },
@@ -80,6 +82,7 @@ export const TOURS: Tour[] = [
     image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80',
     highlights: ['Wild Dolphin Watching', 'Balicasag Marine Sanctuary Snorkeling', 'Sea Turtle Point', 'Virgin Island Sandbar'],
     description: 'Set sail early morning from Panglao to witness playful dolphins, snorkel among sea turtles in Balicasag, and walk the pristine crescent sandbar of Virgin Island.',
+    rating: 4.8,
     itinerary_stops: [
       { time: '6:00 AM', title: 'Hotel pickup & boat briefing', description: 'Meet your boatman at the resort beachfront for a short safety briefing.' },
       { time: '6:30 AM', title: 'Dolphin watching', description: 'Cruise out to open water to spot pods of wild dolphins.' },
@@ -112,6 +115,7 @@ export const TOURS: Tour[] = [
     image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
     highlights: ['Nighttime Paddle Boat', 'Thousands of Glowing Fireflies', 'Serene Mangrove Riverscape'],
     description: 'Experience a magical evening floating down the calm Loboc River illuminated by synchronized twinkling fireflies in the mangroves.',
+    rating: 4.7,
     itinerary_stops: [
       { time: '6:00 PM', title: 'Hotel pickup', description: 'Evening pickup from your Panglao hotel or resort in an air-conditioned vehicle.' },
       { time: '6:45 PM', title: 'Transfer to Loboc', description: 'Scenic drive inland as the sun sets over the countryside.' },
@@ -150,6 +154,7 @@ export const TOURS: Tour[] = [
     description: 'The most popular value package combining our bestselling Countryside Tour and Balicasag Island Hopping adventure into one seamless itinerary.',
     featured: true,
     bestseller: true,
+    rating: 4.9,
     itinerary_stops: [
       { time: 'Day 1 · 7:00 AM', title: 'Hotel pickup', description: 'Pickup from your Panglao hotel or resort in an air-conditioned vehicle.' },
       { time: 'Day 1 · 9:00 AM', title: 'Loboc River Cruise & Lunch', description: 'Buffet lunch aboard a floating restaurant with live music along the river.' },
@@ -194,6 +199,7 @@ export const TOURS: Tour[] = [
       'Airport / Seaport Transfers Included',
     ],
     description: 'The ultimate all-inclusive Bohol holiday package covering inland wonders, marine sanctuaries, night fireflies, and hassle-free roundtrip transfers.',
+    rating: 4.9,
     itinerary_stops: [
       { time: 'Day 1 · Morning', title: 'Airport / seaport pickup', description: 'Roundtrip transfer from your arrival point straight to your Panglao hotel.' },
       { time: 'Day 1 · 9:00 AM', title: 'Countryside Tour & Chocolate Hills', description: 'Loboc River cruise with lunch, Tarsier Sanctuary, and the Chocolate Hills viewing deck.' },

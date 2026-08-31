@@ -159,7 +159,6 @@ const styles = StyleSheet.create({
     bottom: spacing.sm,
     left: spacing.sm,
     backgroundColor: 'rgba(42,38,24,0.7)',
-    backdropFilter: 'blur(4px)',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,

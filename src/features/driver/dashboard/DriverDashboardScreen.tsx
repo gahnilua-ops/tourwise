@@ -16,7 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import {
   Calendar, DollarSign, Bell, MessageSquare, Navigation,
   Phone, MapPin, CheckCircle, Clock, ArrowLeft, ChevronRight,
-  TrendingUp, ShieldCheck, Car, Wallet, BarChart2,
+  TrendingUp, ShieldCheck, Car, Wallet, BarChart2, LocateIcon,
 } from 'lucide-react-native';
 import { supabase } from '@/core/services/supabaseClient';
 import { fetchAssignedTrips } from '@/data/repositories/driverRepository';
@@ -28,28 +28,36 @@ import { colors, radius, spacing, fontSize, fontWeight } from '@/app/theme';
 
 type Tab = 'overview' | 'trips' | 'earnings' | 'notifications' | 'chat';
 
-interface Booking {
+// Trip type matching the database + joined booking
+interface Trip {
   id: string;
-  tour_title: string;
-  guest_name?: string;
-  guest_email?: string;
-  phone?: string;
-  resort?: string;
-  resort_lat?: number | null;
-  resort_lng?: number | null;
-  pax: number;
-  tour_date?: string;
-  pickup_time?: string;
-  status: 'pending' | 'pending_verification' | 'confirmed' | 'completed' | 'cancelled' | 'rejected';
-  net_commission_amount?: number;
-  supplier_amount?: number;
-  driver_id?: string;
-  driver_completed?: boolean;
-  driver_status?: string;
-  client_confirmed_arrival?: boolean;
-  client_confirmed_payment?: boolean;
-  payment_method?: string;
-  addons?: { id: string; label: string; price_php: number }[];
+  booking_id: string;
+  driver_id: string;
+  pickup_time: string;
+  status: 'assigned' | 'in_progress' | 'completed';
+  booking?: {
+    id: string;
+    tour_title: string;
+    guest_name?: string;
+    guest_email?: string;
+    phone?: string;
+    resort?: string;
+    resort_lat?: number | null;
+    resort_lng?: number | null;
+    pax: number;
+    tour_date?: string;
+    pickup_time?: string;
+    status: string;
+    net_commission_amount?: number;
+    supplier_amount?: number;
+    driver_id?: string;
+    driver_completed?: boolean;
+    driver_status?: string;
+    client_confirmed_arrival?: boolean;
+    client_confirmed_payment?: boolean;
+    payment_method?: string;
+    addons?: { id: string; label: string; price_php: number }[];
+  };
 }
 
 export function DriverDashboardScreen() {
@@ -58,7 +66,7 @@ export function DriverDashboardScreen() {
   const [activeTab, setActiveTab] = React.useState<Tab>('overview');
   const [loading, setLoading] = React.useState(true);
   const [driver, setDriver] = React.useState<any>(null);
-  const [trips, setTrips] = React.useState<Booking[]>([]);
+  const [trips, setTrips] = React.useState<Trip[]>([]);
   const [notifications, setNotifications] = React.useState<any[]>([]);
 
   React.useEffect(() => {
@@ -81,13 +89,14 @@ export function DriverDashboardScreen() {
   }, []);
 
   const today = new Date().toISOString().split('T')[0];
-  const todayTrips = trips.filter((t) => t.tour_date === today);
-  const upcomingTrips = trips.filter((t) => t.tour_date && t.tour_date > today && t.status !== 'completed');
+  const todayTrips = trips.filter((t) => t.booking?.tour_date === today);
+  const upcomingTrips = trips.filter((t) => t.booking?.tour_date && t.booking.tour_date > today && t.status !== 'completed');
   const completedTrips = trips.filter((t) => t.status === 'completed');
-  const totalEarnings = completedTrips.reduce((sum, t) => sum + (t.net_commission_amount || 0), 0);
+  const totalEarnings = completedTrips.reduce((sum, t) => sum + (t.booking?.net_commission_amount || 0), 0);
+  // Fixed: compare against booking.status === 'confirmed' instead of trip.status
   const pendingEarnings = trips
-    .filter((t) => t.status === 'confirmed' && !t.driver_completed)
-    .reduce((sum, t) => sum + (t.net_commission_amount || 0), 0);
+    .filter((t) => t.booking?.status === 'confirmed' && !t.booking?.driver_completed)
+    .reduce((sum, t) => sum + (t.booking?.net_commission_amount || 0), 0);
 
   if (loading) {
     return (
@@ -225,11 +234,11 @@ export function DriverDashboardScreen() {
               total={totalEarnings}
               thisMonth={completedTrips
                 .filter((t) => {
-                  const d = new Date(t.tour_date || '');
+                  const d = new Date(t.booking?.tour_date || '');
                   const now = new Date();
                   return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
                 })
-                .reduce((s, t) => s + (t.net_commission_amount || 0), 0)
+                .reduce((s, t) => s + (t.booking?.net_commission_amount || 0), 0)
               }
             />
             <Text style={styles.sectionTitle}>Commission Breakdown</Text>
@@ -290,9 +299,10 @@ function StatCard({ icon: Icon, label, value, color }: { icon: any; label: strin
   );
 }
 
-function NextTripCard({ trip, onNavigate }: { trip: Booking; onNavigate: () => void }) {
-  const pickupMs = trip.tour_date && trip.pickup_time
-    ? new Date(`${trip.tour_date}T${trip.pickup_time}:00`).getTime()
+function NextTripCard({ trip, onNavigate }: { trip: Trip; onNavigate: () => void }) {
+  const booking = trip.booking;
+  const pickupMs = booking?.tour_date && booking?.pickup_time
+    ? new Date(`${booking.tour_date}T${booking.pickup_time}:00`).getTime()
     : null;
   const countdown = pickupMs ? Math.max(0, pickupMs - Date.now()) : null;
   const formatted = countdown ? formatCountdown(countdown) : 'Time TBD';
@@ -301,8 +311,8 @@ function NextTripCard({ trip, onNavigate }: { trip: Booking; onNavigate: () => v
     <View style={styles.nextTripCard}>
       <View style={styles.nextTripMain}>
         <View>
-          <Text style={styles.nextTripTitle}>{trip.tour_title}</Text>
-          <Text style={styles.nextTripGuest}>{trip.guest_name} • {trip.pax} pax</Text>
+          <Text style={styles.nextTripTitle}>{booking?.tour_title || 'Tour'}</Text>
+          <Text style={styles.nextTripGuest}>{booking?.guest_name || 'Guest'} • {booking?.pax || 1} pax</Text>
         </View>
         <View style={styles.nextTripCountdown}>
           <Text style={styles.nextTripTime}>{formatted}</Text>
@@ -314,7 +324,7 @@ function NextTripCard({ trip, onNavigate }: { trip: Booking; onNavigate: () => v
           <MapPin size={16} color="#fff" />
           <Text style={styles.nextTripActionText}>Navigate</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.nextTripActionBtnSecondary} onPress={() => Alert.alert('Call', `Call ${trip.phone || 'guest'}?`)} activeOpacity={0.75}>
+        <TouchableOpacity style={styles.nextTripActionBtnSecondary} onPress={() => Alert.alert('Call', `Call ${booking?.phone || 'guest'}?`)} activeOpacity={0.75}>
           <Phone size={16} color={colors.primary} />
           <Text style={styles.nextTripActionTextSecondary}>Call</Text>
         </TouchableOpacity>
@@ -323,25 +333,26 @@ function NextTripCard({ trip, onNavigate }: { trip: Booking; onNavigate: () => v
   );
 }
 
-function TripListItem({ trip }: { trip: Booking }) {
-  const isToday = trip.tour_date === new Date().toISOString().split('T')[0];
+function TripListItem({ trip }: { trip: Trip }) {
+  const booking = trip.booking;
+  const isToday = booking?.tour_date === new Date().toISOString().split('T')[0];
   return (
     <TouchableOpacity style={[styles.tripCard, isToday && styles.tripCardToday]} activeOpacity={0.75}>
       <View style={styles.tripCardHeader}>
-        <Text style={styles.tripCardTitle}>{trip.tour_title}</Text>
-        <Badge variant={trip.status === 'completed' ? 'success' : trip.status === 'confirmed' ? 'info' : 'warning'} size="sm">
+        <Text style={styles.tripCardTitle}>{booking?.tour_title || 'Tour'}</Text>
+        <Badge variant={trip.status === 'completed' ? 'success' : trip.status === 'assigned' ? 'info' : 'warning'} size="sm">
           {trip.status}
         </Badge>
       </View>
       <View style={styles.tripCardMeta}>
-        <MetaRow icon={Calendar} text={trip.tour_date ? formatDate(trip.tour_date) : 'TBD'} />
-        <MetaRow icon={Clock} text={trip.pickup_time || 'Time TBD'} />
-        <MetaRow icon={MapPin} text={trip.resort || 'Pickup TBD'} />
+        <MetaRow icon={Calendar} text={booking?.tour_date ? formatDate(booking.tour_date) : 'TBD'} />
+        <MetaRow icon={Clock} text={booking?.pickup_time || 'Time TBD'} />
+        <MetaRow icon={MapPin} text={booking?.resort || 'Pickup TBD'} />
       </View>
       <View style={styles.tripCardFooter}>
-        <Text style={styles.tripCardGuest}>{trip.guest_name} • {trip.pax} pax</Text>
+        <Text style={styles.tripCardGuest}>{booking?.guest_name || 'Guest'} • {booking?.pax || 1} pax</Text>
         <Text style={styles.tripCardCommission}>
-          PHP {(trip.net_commission_amount || 0).toLocaleString()}
+          PHP {(booking?.net_commission_amount || 0).toLocaleString()}
         </Text>
       </View>
     </TouchableOpacity>
@@ -367,17 +378,18 @@ function EarningsStat({ label, value, color }: { label: string; value: string; c
   );
 }
 
-function EarningsRow({ trip }: { trip: Booking }) {
+function EarningsRow({ trip }: { trip: Trip }) {
+  const booking = trip.booking;
   return (
     <View style={styles.earningsRow}>
       <View>
-        <Text style={styles.earningsRowTitle}>{trip.tour_title}</Text>
-        <Text style={styles.earningsRowDate}>{formatDate(trip.tour_date)} • {trip.guest_name}</Text>
+        <Text style={styles.earningsRowTitle}>{booking?.tour_title || 'Tour'}</Text>
+        <Text style={styles.earningsRowDate}>{formatDate(booking?.tour_date || '')} • {booking?.guest_name || 'Guest'}</Text>
       </View>
       <View style={styles.earningsRowAmount}>
         <Text style={styles.earningsRowAmountLabel}>Commission</Text>
         <Text style={styles.earningsRowAmountValue}>
-          PHP {(trip.net_commission_amount || 0).toLocaleString()}
+          PHP {(booking?.net_commission_amount || 0).toLocaleString()}
         </Text>
       </View>
     </View>

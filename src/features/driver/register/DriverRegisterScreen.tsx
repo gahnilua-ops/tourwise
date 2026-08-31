@@ -7,13 +7,12 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   ActivityIndicator,
   Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { ImagePicker } from 'expo-image-picker';
+import * as ImagePicker from 'expo-image-picker';
 import {
   Car, Phone, Upload, FileText, CheckCircle, ArrowLeft, User, X, Loader2,
   ChevronLeft, ChevronRight,
@@ -30,7 +29,7 @@ export function DriverRegisterScreen() {
   const [driverName, setDriverName] = React.useState('');
   const [contactNumber, setContactNumber] = React.useState('');
   const [type, setType] = React.useState<DriverType>('driver');
-  const [vehicleType, setVehicleType] = React.useState<VehicleType>('');
+  const [vehicleType, setVehicleType] = React.useState<VehicleType>(VEHICLE_TYPES[0]);
   const [vehicleColor, setVehicleColor] = React.useState('');
   const [plateNumber, setPlateNumber] = React.useState('');
   const [permitUri, setPermitUri] = React.useState<string | null>(null);
