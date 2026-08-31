@@ -17,6 +17,7 @@ import { LegalScreen } from '@/features/legal/LegalScreen';
 import { NotificationsScreen } from '@/features/notifications/NotificationsScreen';
 import { TourDetailScreen } from '@/features/tours/TourDetailScreen';
 import { PlaceDetailScreen } from '@/features/places/PlaceDetailScreen';
+import { DriverUploadScreen } from '@/features/driver/upload/DriverUploadScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -40,6 +41,7 @@ export function RootNavigator() {
 
       <Stack.Screen name="TourDetail" component={TourDetailScreen} options={{ headerShown: false }} />
       <Stack.Screen name="PlaceDetail" component={PlaceDetailScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="DriverUpload" component={DriverUploadScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }
