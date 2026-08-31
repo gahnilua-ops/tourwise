@@ -11,20 +11,24 @@ export function RoleGate() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
-        navigation.replace('Login');
+        if (mounted) navigation.replace('Login');
         return;
       }
 
-      // TODO: fetch role from `profiles` table and route accordingly.
+      // Fetch role from `profiles` table
       const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', session.user.id)
         .single();
+
+      if (!mounted) return;
 
       if (profile?.role === 'driver') {
         navigation.replace('DriverShell');
@@ -33,11 +37,39 @@ export function RoleGate() {
       }
       setChecking(false);
     })();
+
+    // Listen for auth changes (e.g. magic link clicks)
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
+      if (!session) {
+        navigation.replace('Login');
+        return;
+      }
+      // Refetch profile on sign-in
+      supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single()
+        .then(({ data: profile }) => {
+          if (!mounted) return;
+          if (profile?.role === 'driver') {
+            navigation.replace('DriverShell');
+          } else {
+            navigation.replace('TouristShell');
+          }
+        });
+    });
+
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
   }, [navigation]);
 
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      {checking && <ActivityIndicator size="large" />}
+      {checking && <ActivityIndicator size="large" color="#0E7C7B" />}
     </View>
   );
 }
