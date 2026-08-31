@@ -15,6 +15,8 @@ import { FaqScreen } from '@/features/support/faq/FaqScreen';
 import { ChatScreen } from '@/features/support/chat/ChatScreen';
 import { LegalScreen } from '@/features/legal/LegalScreen';
 import { NotificationsScreen } from '@/features/notifications/NotificationsScreen';
+import { TourDetailScreen } from '@/features/tours/TourDetailScreen';
+import { PlaceDetailScreen } from '@/features/places/PlaceDetailScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +37,9 @@ export function RootNavigator() {
       <Stack.Screen name="Chat" component={ChatScreen} />
       <Stack.Screen name="Legal" component={LegalScreen} />
       <Stack.Screen name="Notifications" component={NotificationsScreen} />
+
+      <Stack.Screen name="TourDetail" component={TourDetailScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="PlaceDetail" component={PlaceDetailScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }
