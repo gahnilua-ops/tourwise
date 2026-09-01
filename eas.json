@@ -14,8 +14,7 @@
     "production": {
       "autoIncrement": true,
       "android": {
-        "buildType": "app-bundle",
-        "extraGradleArgs": ["-PkotlinVersion=1.9.25"]
+        "buildType": "app-bundle"
       }
     }
   },
