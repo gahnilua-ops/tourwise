@@ -1,0 +1,25 @@
+{
+  "cli": {
+    "version": ">= 23.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle",
+        "extraGradleArgs": ["-PkotlinVersion=1.9.25"]
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
